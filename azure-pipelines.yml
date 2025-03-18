@@ -20,8 +20,7 @@ steps:
      npm install snyk-to-html -g
      mkdir -p results
      snyk auth $(SNYK_TOKEN)
-     snyk test --all-projects --json-file-output=resutls/oss.json
-     ContinueOnError: true
+     snyk test --all-projects --json-file-output=results/oss.json
      snyk-to-html -o results/oss.html < results/oss.json
   env:
     SNYK_TOKEN: $(SNYK_TOKEN)
