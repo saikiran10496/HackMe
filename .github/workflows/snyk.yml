@@ -19,20 +19,33 @@ jobs:
       - name: Install Dependencies
         run: npm ci
 
-      - name: Install Snyk CLI
-        run: npm install -g snyk
-
-      - name: Run Snyk Code Analysis
-        run: snyk code test --report --project-name="${{ github.event.repository.name }}-code" 
+      # Run Snyk to check for code vulnerabilities
+      - name: Snyk Code Test
+        uses: snyk/actions/node@master
+        with:
+          command: code test
+          args: --severity-threshold=high
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
           SNYK_ORG: ${{ secrets.SNYK_ORG }}
 
-      - name: Run Snyk Dependencies Scan
-        run: snyk test --report --project-name="${{ github.event.repository.name }}-deps"
+      # Run Snyk to check for dependencies vulnerabilities
+      - name: Snyk Dependencies Test
+        uses: snyk/actions/node@master
+        with:
+          command: test
+          args: --severity-threshold=high
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
           SNYK_ORG: ${{ secrets.SNYK_ORG }}
 
+      # Monitor the project in Snyk
+      - name: Monitor Project in Snyk
+        uses: snyk/actions/node@master
+        with:
+          command: monitor
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+          SNYK_ORG: ${{ secrets.SNYK_ORG }}
 
      
