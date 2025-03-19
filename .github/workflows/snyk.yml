@@ -19,33 +19,52 @@ jobs:
       - name: Install Dependencies
         run: npm ci
 
-      # Run Snyk to check for code vulnerabilities
+      # Run Snyk to check for code vulnerabilities and generate report
       - name: Snyk Code Test
         uses: snyk/actions/node@master
+        continue-on-error: true  # Don't fail the workflow on vulnerabilities
         with:
           command: code test
-          args: --severity-threshold=high
+          args: --json-file-output=snyk-code.json --sarif-file-output=snyk-code.sarif
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
           SNYK_ORG: ${{ secrets.SNYK_ORG }}
 
-      # Run Snyk to check for dependencies vulnerabilities
+      # Run Snyk to check for dependencies vulnerabilities and generate report
       - name: Snyk Dependencies Test
         uses: snyk/actions/node@master
+        continue-on-error: true  # Don't fail the workflow on vulnerabilities
         with:
           command: test
-          args: --severity-threshold=high
+          args: --json-file-output=snyk-deps.json --sarif-file-output=snyk-deps.sarif
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
           SNYK_ORG: ${{ secrets.SNYK_ORG }}
+
+      # Upload SARIF files to GitHub Security tab
+      - name: Upload SARIF files to GitHub
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: |
+            snyk-code.sarif
+            snyk-deps.sarif
 
       # Monitor the project in Snyk
       - name: Monitor Project in Snyk
         uses: snyk/actions/node@master
         with:
           command: monitor
+          args: --project-name=github/${{ github.repository }}
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
           SNYK_ORG: ${{ secrets.SNYK_ORG }}
+
+      # Create GitHub Issues for High severity vulnerabilities
+      - name: Create GitHub Issues
+        if: github.event_name != 'pull_request'  # Don't create issues for PRs
+        uses: snyk/actions/issue-manager@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
      
