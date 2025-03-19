@@ -1,0 +1,92 @@
+name: Security Scan
+
+on:
+  push:
+    branches: main
+  workflow_dispatch:  # Allow manual triggers
+
+jobs:
+  security:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+      actions: read
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+        
+      - name: Install Snyk CLI
+        run: npm install -g snyk
+
+      - name: Authenticate Snyk
+        run: snyk auth ${{ secrets.SNYK_TOKEN }}
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+
+      - name: Run Snyk Dependencies Scan
+        continue-on-error: true
+        run: |
+          snyk test \
+            --all-projects \
+            --detection-depth=10 \
+            --org=${{ secrets.SNYK_ORG }} \
+            --json > snyk-deps.json \
+            --monitor
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+          SNYK_ORG: ${{ secrets.SNYK_ORG }}
+
+      - name: Run Snyk Code Analysis
+        if: '!cancelled()'
+        run: |
+          snyk code test \
+            --severity-threshold=low \
+            --detection-depth=10 \
+            --org=${{ secrets.SNYK_ORG }} \
+            --project-name="${{ github.event.repository.name }}" \
+            --target-name="${{ github.repository }}" \
+            --monitor
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+          SNYK_ORG: ${{ secrets.SNYK_ORG }}
+
+      - name: Generate SARIF file from Snyk Dependencies Scan
+        if: always()
+        run: |
+          if [ -f snyk-deps.json ]; then
+            snyk-to-html -i snyk-deps.json -o dependency-results.html
+            snyk-to-html -i snyk-deps.json --format=sarif > snyk.sarif
+          fi
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+
+      - name: Upload Dependency Scan Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: snyk-results
+          path: |
+            dependency-results.html
+            snyk.sarif
+          retention-days: 7
+
+      - name: Upload SARIF file to GitHub Security Tab
+        if: always()
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: snyk.sarif
+          category: Snyk-Dependencies
