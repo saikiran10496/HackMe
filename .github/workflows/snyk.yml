@@ -59,12 +59,6 @@ jobs:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
           SNYK_ORG: ${{ secrets.SNYK_ORG }}
 
-      # Create GitHub Issues for High severity vulnerabilities
-      - name: Create GitHub Issues
-        if: github.event_name != 'pull_request'  # Don't create issues for PRs
-        uses: snyk/actions/issue-manager@master
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
 
      
