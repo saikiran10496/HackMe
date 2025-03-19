@@ -23,13 +23,13 @@ jobs:
         run: npm install -g snyk
 
       - name: Run Snyk Code Analysis
-        run: snyk code test --report
+        run: snyk code test --report --project-name="${{ github.event.repository.name }}-code" 
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
           SNYK_ORG: ${{ secrets.SNYK_ORG }}
 
       - name: Run Snyk Dependencies Scan
-        run: snyk test --report
+        run: snyk test --report --project-name="${{ github.event.repository.name }}-deps"
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
           SNYK_ORG: ${{ secrets.SNYK_ORG }}
