@@ -16,7 +16,6 @@ jobs:
         continue-on-error: true  # Don't fail the workflow on vulnerabilities
         with:
           command: code test
-          # args: --all-projects --json-file-output=snyk-code.json --sarif-file-output=snyk-code.sarif
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
           SNYK_ORG: ${{ secrets.SNYK_ORG }}
@@ -27,7 +26,6 @@ jobs:
         continue-on-error: true  # Don't fail the workflow on vulnerabilities
         with:
           command: test
-         # args: --all-projects --json-file-output=snyk-deps.json --sarif-file-output=snyk-deps.sarif
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
           SNYK_ORG: ${{ secrets.SNYK_ORG }}
