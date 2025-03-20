@@ -18,7 +18,6 @@ jobs:
           command: code test
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-         # SNYK_ORG: ${{ secrets.SNYK_ORG }}
 
       # Run Snyk to check for dependencies vulnerabilities and generate report
       - name: Snyk Dependencies Test
@@ -28,8 +27,6 @@ jobs:
           command: test
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-          #SNYK_ORG: ${{ secrets.SNYK_ORG }}
-
 
       # Monitor the project in Snyk
       - name: Monitor Project in Snyk
@@ -38,9 +35,4 @@ jobs:
           command: monitor
           args: --project-name=github/${{ github.repository }}
         env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-          #SNYK_ORG: ${{ secrets.SNYK_ORG }}
-
-
-
-     
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}     
