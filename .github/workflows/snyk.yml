@@ -29,10 +29,10 @@ jobs:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
       # Monitor the project in Snyk
-      - name: Monitor Project in Snyk
-        uses: snyk/actions/node@master
-        with:
-          command: monitor
-          args: --project-name=github/${{ github.repository }}
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}     
+     # - name: Monitor Project in Snyk
+      #  uses: snyk/actions/node@master
+       # with:
+        #  command: monitor
+         # args: --project-name=github/${{ github.repository }}
+       # env:
+        #  SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}     
