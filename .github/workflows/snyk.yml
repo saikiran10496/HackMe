@@ -12,6 +12,7 @@ jobs:
       
       - name: Install Snyk CLI
         run: |
+          npm install && npm run client-install
           curl --compressed https://downloads.snyk.io/cli/stable/snyk-linux -o snyk
           chmod +x ./snyk
           sudo mv ./snyk /usr/local/bin/
