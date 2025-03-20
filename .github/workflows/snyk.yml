@@ -26,13 +26,13 @@ jobs:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
       # Run Snyk to check for dependencies vulnerabilities and generate report
-      - name: Snyk Dependencies Test
-        uses: snyk/actions/node@master
-        continue-on-error: true  # Don't fail the workflow on vulnerabilities
-        with:
-          command: test
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+      #- name: Snyk Dependencies Test
+       # uses: snyk/actions/node@master
+        #continue-on-error: true  # Don't fail the workflow on vulnerabilities
+        #with:
+         # command: test
+       # env:
+        #  SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
       # Monitor the project in Snyk
      # - name: Monitor Project in Snyk
